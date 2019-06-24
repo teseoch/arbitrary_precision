@@ -1,12 +1,10 @@
-#ifndef INC_PRECISION
-#define INC_PRECISION
-
+#pragma once
 /*
  *******************************************************************************
  *
  *
  *                       Copyright (c) 2002-2017
- *                       Future Team Aps 
+ *                       Future Team Aps
  *                       Denmark
  *
  *                       All Rights Reserved
@@ -23,10 +21,10 @@
  *
  *
  * Module name     :   iprecision.h
- * Module ID Nbr   :   
+ * Module ID Nbr   :
  * Description     :   Arbitrary integer precision class
  * --------------------------------------------------------------------------
- * Change Record   :   
+ * Change Record   :
  *
  * Version	Author/Date		Description of changes
  * -------  -----------		----------------------
@@ -36,7 +34,7 @@
  *                         Without causing linker errors
  * 01.02    HVE/030514     % operator was speed optimized to the same speed as the
  *                         the / operator. Furthere more now both /, % operator
- *                         advantages of short_division or short_remainding 
+ *                         advantages of short_division or short_remainding
  *                         speeding up the / and % operator
  * 01.03    HVE/030602     A bug for RADIX==BASE_256 in the udiv() and urem()
  *                         function. Quotient was initialized wrongly to "1" instead
@@ -61,8 +59,8 @@
  *                         to MicroSoft _itoa().
  * 01.13	HVE/20100527   Port to Visual Express studio 10
  * 01.14	HVE/20100609   (unsigned long) operator now used strtoul() instead of wrongly atoi()
- * 01.15	HVE/20100701   Shifting a zero BASE 2 representation left was done wrongly.	
- * 01.16	HVE/20100701   Initializing a precision string to internal BASE 2 resulted in a 
+ * 01.15	HVE/20100701   Shifting a zero BASE 2 representation left was done wrongly.
+ * 01.16	HVE/20100701   Initializing a precision string to internal BASE 2 resulted in a
  *							Exception when digit was higher than BASE_2
  * 01.17	HVE/20100702	Added short cuts for shifting left and right with zero or do left/rigth zero shifts
  * 01.18	HVE/20100703	Fix a bug when an addition resultet in zero and RADIX > 10
@@ -83,11 +81,9 @@
  * --------------------------------------------------------------------------
 */
 
-/* define version string */
-static char _VI_[] = "@(#)iprecision.h 01.29 -- Copyright (C) Future Team Aps";
 
 // If _INT_PRECESION_FAST_DIV_REM is defined it will use a magnitude faster div and rem integer operation.
-#define _INT_PRECISSION_FAST_DIV_REM
+// #define _INT_PRECISSION_FAST_DIV_REM
 
 #include <limits.h>
 #include <string>
@@ -98,11 +94,17 @@ static char _VI_[] = "@(#)iprecision.h 01.29 -- Copyright (C) Future Team Aps";
 #include <ostream>
 #include <istream>
 #include <cstdlib>
-using std::atoi; using std::strtoul;
-// End ANSI addition 
+// End ANSI addition
 
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <string.h>
+
+namespace arbitrary_precision
+{
+using std::atoi;
+using std::strtoul;
+/* define version string */
+static char _VI_[] = "@(#)iprecision.h 01.29 -- Copyright (C) Future Team Aps";
 
 // RADIX can either be 2, 8, 10, 16 or 256!
 static const int BASE_2	  = 2;
@@ -132,7 +134,7 @@ class precision_ctrl {
    public:
       // Constructor
       precision_ctrl( unsigned int ir=BASE_10, unsigned int fr=BASE_10): mIRadix(ir), mFRadix(fr) {}
-      
+
       // Coordinate functions
       inline int I_RADIX() const						{ return mIRadix; }
       inline int I_RADIX( unsigned int ir )		{ return( mIRadix = ir ); }
@@ -159,9 +161,9 @@ class int_precision;
 // Arithmetic
 template <class _Ty> inline int_precision operator+( int_precision&, const _Ty& );
 template <class _Ty> inline int_precision operator+( const _Ty&, const int_precision& );
-inline int_precision operator+( const int_precision& );        // Unary 
-inline int_precision operator++( int_precision& );       // Postfix Increment 
-inline int_precision operator++( int_precision&, int );  // Postfix Increment 
+inline int_precision operator+( const int_precision& );        // Unary
+inline int_precision operator++( int_precision& );       // Postfix Increment
+inline int_precision operator++( int_precision&, int );  // Postfix Increment
 
 template <class _Ty> inline int_precision operator-( int_precision&, const _Ty&);
 template <class _Ty> inline int_precision operator-( const _Ty&, const int_precision& );
@@ -196,9 +198,9 @@ template <class _Ty> inline bool operator<=( const _Ty&, const int_precision& );
 template <class _Ty> inline bool operator<( int_precision&, const _Ty& );
 template <class _Ty> inline bool operator<( const _Ty&, const int_precision& );
 
-// Integer Precision functions 
+// Integer Precision functions
 extern int_precision abs(const int_precision&);
-extern int_precision ipow( const int_precision&, const int_precision& );    // a^b 
+extern int_precision ipow( const int_precision&, const int_precision& );    // a^b
 extern int_precision ipow_modular( const int_precision&, const int_precision&, const int_precision& ); // a^b%c
 extern bool iprime( const int_precision& );
 
@@ -232,7 +234,7 @@ std::string i64to_precision_string( uint64_t, const bool, const int base = RADIX
 /// @version 1.0
 /// @brief  This is an arbitrary integer class
 ///
-/// @todo  	
+/// @todo
 ///
 /// Precision class
 /// An Arbitrary integer always has the format [sign][digit]+ where sign is either '+' or '-'
@@ -262,12 +264,12 @@ class int_precision
 	  int_precision( const uint64_t );		// When initialized through a 64 bit unsinged int
 	  int_precision( const int_precision& s) : mNumber(s.mNumber) {}  // When initialized through another int_precision
 
-         
+
       // Coordinate functions
       std::string copy() const   { return mNumber; }
       std::string *pointer()     { return &mNumber; }
-      int sign() const           { return CHAR_SIGN( mNumber[0] ); }                    
-      int change_sign()          { // Change and return sign   
+      int sign() const           { return CHAR_SIGN( mNumber[0] ); }
+      int change_sign()          { // Change and return sign
                                  if( mNumber.length() != 2 || IDIGIT( mNumber[1] ) != 0 ) // Don't change sign for +0!
                                     if( mNumber[0] == '+' ) mNumber[0] = '-'; else mNumber[0] = '+';
                                  return CHAR_SIGN( mNumber[0] );
@@ -276,7 +278,7 @@ class int_precision
 
 	  // Conversion methods. Safer and less ambiguios than overloading implicit/explivit conversion operators
       std::string toString()	{ return _int_precision_itoa(this); }
- 
+
 	  // Implict/explicit conversion operators
 	  operator long() const;
       operator int() const;
@@ -286,9 +288,9 @@ class int_precision
       operator unsigned int() const;
       operator unsigned short() const;
       operator unsigned char() const;
-      operator double() const; 
-      operator float() const; 
-	  
+      operator double() const;
+      operator float() const;
+
       // Essential operators
       int_precision& operator=( const int_precision& );
       int_precision& operator+=( const int_precision& );
@@ -307,7 +309,7 @@ class int_precision
 		friend std::istream& operator>>( std::istream& strm, int_precision& d );
 
       // Exception class
-      class bad_int_syntax {}; 
+      class bad_int_syntax {};
       class out_of_range   {};
       class divide_by_zero {};
    };
@@ -328,18 +330,18 @@ class int_precision
 ///	@return 	nothing
 ///	@param   "str"	-	Convert the character string number into a multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
-///   Constructor 
+///   Constructor
 ///   Validate input and convert to internal representation
-///   Always add sign if not specified 
+///   Always add sign if not specified
 ///   Only use core base functions to create multi precision numbers
 //
 inline int_precision::int_precision( const char *str )
    {
    std::string s(str);
-   
+
    if( s.empty() )
       { throw bad_int_syntax(); return; }
 
@@ -352,12 +354,12 @@ inline int_precision::int_precision( const char *str )
 ///	@return 	nothing
 ///	@param   "str"	-	Convert the std::string number into a multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
-///   Constructor 
+///   Constructor
 ///   Validate input and convert to internal representation
-///   Always add sign if not specified 
+///   Always add sign if not specified
 ///   Only use core base functions to create multi precision numbers
 //
 //
@@ -376,20 +378,20 @@ inline int_precision::int_precision(const std::string& str)
 ///	@return 	nothing
 ///	@param   "c"	-	the character integer to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
 ///   Validate and initilize with a character
 ///   Input Always in BASE_10
-///   Convert to the internal RADIX 
+///   Convert to the internal RADIX
 //
 inline int_precision::int_precision( char c )
    {
    if( c < '0' || c > '9' )
-      throw bad_int_syntax(); 
+      throw bad_int_syntax();
    else
-      { 
+      {
       mNumber = ito_precision_string( IDIGIT10( c ), true );  // Convert to integer
       }
    }
@@ -400,20 +402,20 @@ inline int_precision::int_precision( char c )
 ///	@return 	nothing
 ///	@param   "c"	-	the character integer to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
 ///   Validate and initilize with a character
 ///   Input Always in BASE_10
-///   Convert to the internal RADIX 
+///   Convert to the internal RADIX
 //
 inline int_precision::int_precision( unsigned char c )
    {
    if( c < '0' || c > '9' )
-      throw bad_int_syntax(); 
+      throw bad_int_syntax();
    else
-      { 
+      {
       mNumber = ito_precision_string( IDIGIT10( c ), true );  // Convert to integer
       }
    }
@@ -424,7 +426,7 @@ inline int_precision::int_precision( unsigned char c )
 ///	@return 	nothing
 ///	@param   "i"	-	the binary integer to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
@@ -445,7 +447,7 @@ inline int_precision::int_precision( short i )
 ///	@return 	nothing
 ///	@param   "i"	-	the binary integer to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
@@ -466,7 +468,7 @@ inline int_precision::int_precision( unsigned short i )
 ///	@return 	nothing
 ///	@param   "i"	-	the binary integer to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
@@ -487,7 +489,7 @@ inline int_precision::int_precision( int i )
 ///	@return 	nothing
 ///	@param   "i"	-	the binary unsigned integer to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
@@ -507,7 +509,7 @@ inline int_precision::int_precision( unsigned int i )
 ///	@return 	nothing
 ///	@param   "i"	-	the binary integer to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
@@ -528,7 +530,7 @@ inline int_precision::int_precision( long i )
 ///	@return 	nothing
 ///	@param   "i"	-	the binary unsigned long to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
@@ -548,7 +550,7 @@ inline int_precision::int_precision( unsigned long i )
 ///	@return 	nothing
 ///	@param   "i"	-	the binary int64_t to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
@@ -569,7 +571,7 @@ inline int_precision::int_precision( int64_t i)
 ///	@return 	nothing
 ///	@param   "i"	-	the binary uint64_t to convert to multi precision number
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Constructor
@@ -594,9 +596,9 @@ inline int_precision::int_precision( uint64_t i)
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_precision::operator long
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  	
+///	@todo
 ///
 /// Description:
 ///   This is the main operator from int_precision to regular long, int, short & char
@@ -608,19 +610,19 @@ inline int_precision::int_precision( uint64_t i)
 inline int_precision::operator long() const
    {// Conversion to long
    long l;
-   if( RADIX == BASE_10 ) 
+   if( RADIX == BASE_10 )
       l = atoi( mNumber.c_str() ); // Do it directly
-   else 
+   else
       l = atoi( _int_precision_itoa( &mNumber ).c_str() ); // Need to convert from RADIX to BASE_10 )
    return l;
-   }    
+   }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_precision::operator int
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Any explicit or implicit copnversion first convert to standard c long type and then to int
@@ -630,14 +632,14 @@ inline int_precision::operator long() const
 inline int_precision::operator int() const
    {// Conversion to int
    return (int)(long)*this;
-   }    
+   }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_precision::operator short
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Any explicit or implicit copnversion first convert to standard c long type and then to short
@@ -647,14 +649,14 @@ inline int_precision::operator int() const
 inline int_precision::operator short() const
    {// Conversion to short
    return (short)((long)*this);
-   }    
+   }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_precision::operator char
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Any explicit or implicit copnversion first convert to standard c long type and then to char
@@ -664,14 +666,14 @@ inline int_precision::operator short() const
 inline int_precision::operator char() const
    {// Conversion to char
    return (char)((long)*this);
-   }    
+   }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_precision::operator unsigned long
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Any explicit or implicit copnversion first convert to standard c long type and then to int
@@ -681,19 +683,19 @@ inline int_precision::operator char() const
 inline int_precision::operator unsigned long() const
    {// Conversion to unsigned long
    unsigned long ul;
-   if( RADIX == BASE_10 ) 
+   if( RADIX == BASE_10 )
       ul = strtoul( mNumber.c_str(), NULL, BASE_10 ); // Do it directly
-   else 
+   else
       ul = strtoul( _int_precision_itoa( &mNumber ).c_str(), NULL, BASE_10 ); // Need to convert from RADIX to BASE_10 )
    return ul;
-   }    
+   }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_precision::operator unsigned int
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Any explicit or implicit copnversion first convert to standard c long type and then to int
@@ -703,14 +705,14 @@ inline int_precision::operator unsigned long() const
 inline int_precision::operator unsigned int() const
    {// Conversion to int
    return (unsigned int)(unsigned long)*this;
-   }    
+   }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_precision::operator unsigned short
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Any explicit or implicit copnversion first convert to standard c long type and then to short
@@ -720,14 +722,14 @@ inline int_precision::operator unsigned int() const
 inline int_precision::operator unsigned short() const
    {// Conversion to short
    return (unsigned short)((unsigned long)*this);
-   }    
+   }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_precision::operator unsigned char
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Any explicit or implicit copnversion first convert to standard c long type and then to char
@@ -737,42 +739,42 @@ inline int_precision::operator unsigned short() const
 inline int_precision::operator unsigned char() const
    {// Conversion to char
    return (unsigned char)((unsigned long)*this);
-   }    
+   }
 
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_preceision::operator double
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  
+///	@todo
 ///
 /// Description:
 ///   Conversion from int_precision to double
 ///
 inline int_precision::operator double() const
    {// Conversion to double
-   if( RADIX == BASE_10 ) 
+   if( RADIX == BASE_10 )
       return (double)atof( mNumber.c_str() ); // Do it directly
-   else  
+   else
       return (double)atof( _int_precision_itoa( &mNumber ).c_str() ); // Need to convert from RADIX to BASE_10
-   }                               
+   }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  2/17/2006
 ///	@brief 			int_precision::operator float
-///	@return 			inline	-	
+///	@return 			inline	-
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
-///   Conversion from int_precision to float 
+///   Conversion from int_precision to float
 ///   Using the double conversion frist and then trunk to float using standard c conversion
 ///
 inline int_precision::operator float() const
    {// Conversion to float
    return (float)((double)*this);
-   }    
+   }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -788,7 +790,7 @@ inline int_precision::operator float() const
 ///	@return 	static int_precision	-	return a=b
 ///	@param   "a"	-	Assignment operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   Assign operator
@@ -806,7 +808,7 @@ inline int_precision& int_precision::operator=( const int_precision& a )
 ///	@return 	static int_precision	-	return a +=b
 ///	@param   "a"	-	Adding operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   += operator
@@ -818,7 +820,7 @@ inline int_precision& int_precision::operator+=( const int_precision& a )
 	int cmp;
 
    // extract sign and unsigned portion of number
-   sign1 = a.sign(); 
+   sign1 = a.sign();
    s1 = a.mNumber.substr( 1 );
    sign2 = CHAR_SIGN( mNumber[0] );
    s2 = mNumber.substr( 1 );
@@ -839,7 +841,7 @@ inline int_precision& int_precision::operator+=( const int_precision& a )
 				mNumber.append( 1, ICHARACTER(0) );
 				}
 		}
-   
+
    return *this;
    }
 
@@ -849,12 +851,12 @@ inline int_precision& int_precision::operator+=( const int_precision& a )
 ///	@return 	static int_precision	-	return a -=b
 ///	@param   "a"	-	Subtracting operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   -= operator
 ///   The essential -= operator
-///   n = n - a is the same as n = n + (-a); 
+///   n = n - a is the same as n = n + (-a);
 //
 inline int_precision& int_precision::operator-=( const int_precision& a )
    {
@@ -873,7 +875,7 @@ inline int_precision& int_precision::operator-=( const int_precision& a )
 ///	@return 	static int_precision	-	return a *=b
 ///	@param   "a"	-	Multiplying operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   *= operator
@@ -911,7 +913,7 @@ inline int_precision& int_precision::operator*=( const int_precision& a )
 ///	@return 	static int_precision	-	return a /=b
 ///	@param   "a"	-	Dividing operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   /= operator
@@ -951,7 +953,7 @@ inline int_precision& int_precision::operator/=( const int_precision& a )
 ///	@return 	static int_precision	-	return a %=b
 ///	@param   "a"	-	Modulus operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   %= operator
@@ -990,7 +992,7 @@ inline int_precision& int_precision::operator%=( const int_precision& a )
 ///	@return static int_precision	-	return shifting a<<= b
 ///	@param  "a"	-	Shifting number
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   <<= operator
@@ -1038,9 +1040,9 @@ inline int_precision& int_precision::operator<<=( const int_precision& a )
       {
       int shift;
 
-      if( RADIX == BASE_10 ) 
+      if( RADIX == BASE_10 )
          shift = atoi( s2.c_str() ); // Do it directly
-      else 
+      else
          {
          s2.insert( 0, "+" );
          shift = atoi( _int_precision_itoa( &s2 ).c_str() ); // Need to convert from RADIX to BASE_10
@@ -1048,16 +1050,16 @@ inline int_precision& int_precision::operator<<=( const int_precision& a )
          }
 
 		if( RADIX >= BASE_10 && RADIX > (2<<(shift-1)) )
-			s1 = _int_precision_umul_short( &s1, 2 << ( shift - 1 ) ); 
+			s1 = _int_precision_umul_short( &s1, 2 << ( shift - 1 ) );
 		else
 			{
 			for( ; shift > 0; --shift )
-				s1 = _int_precision_umul_short( &s1, 2 ); 
+				s1 = _int_precision_umul_short( &s1, 2 );
 			}
       }
 
    mNumber = SIGN_STRING( sign1 ) + s1;
-   
+
    return *this;
    }
 
@@ -1067,7 +1069,7 @@ inline int_precision& int_precision::operator<<=( const int_precision& a )
 ///	@return int_precision	-	return shifting a>>= b
 ///	@param   "a"	-	Shifting operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   >>= operator
@@ -1078,14 +1080,14 @@ inline int_precision& int_precision::operator>>=( const int_precision& a )
    unsigned int rem;
    std::string s1, s2;
    std::string cshifts, c0, c3, c4, c8;
-   
+
    c0.insert((std::string::size_type)0, 1, ICHARACTER(0) );
    // extract sign and unsigned portion of number
    sign1 = CHAR_SIGN(mNumber[0] );
    s1 = mNumber.substr( 1 );
    if( _int_precision_compare( &s1, &c0 ) == 0 )  // Short cut: zero shifting right is still zero.
 		return *this;
-   
+
    sign2 = a.sign();
    s2 = a.mNumber.substr( 1 );
    if( _int_precision_compare( &s2, &c0 ) == 0 )  // Short cut: shift zero right does not change the number.
@@ -1099,7 +1101,7 @@ inline int_precision& int_precision::operator>>=( const int_precision& a )
    if( RADIX > BASE_2 )  // Speed up by alowing shift with 8 (2^8) at a time instead of single shift
       {
      for( ; _int_precision_compare( &s2, &cshifts ) >= 0; s2 = _int_precision_usub_short( &wrap, &s2, max_shifts ) )
-         s1 = _int_precision_udiv_short( &rem, &s1, 1 << max_shifts ); //1<<max_shifts 
+         s1 = _int_precision_udiv_short( &rem, &s1, 1 << max_shifts ); //1<<max_shifts
       }
    else
 		{
@@ -1119,9 +1121,9 @@ inline int_precision& int_precision::operator>>=( const int_precision& a )
       {
       int shift;
 
-      if( RADIX == BASE_10 ) 
+      if( RADIX == BASE_10 )
          shift = atoi( s2.c_str() ); // Do it directly
-      else 
+      else
          {
          s2.insert( 0, "+" );
          shift = atoi( _int_precision_itoa( &s2 ).c_str() ); // Need to convert from RADIX to BASE_10 )
@@ -1138,7 +1140,7 @@ inline int_precision& int_precision::operator>>=( const int_precision& a )
    mNumber = SIGN_STRING( sign1 ) + s1;
    if( sign1 == -1 && mNumber.length() == 2 && IDIGIT( mNumber[1] ) == 0 )  // Avoid -0 as result +0 is right
       mNumber[0] = '+';
-   
+
    return *this;
    }
 /*
@@ -1148,7 +1150,7 @@ inline int_precision& int_precision::operator>>=( const int_precision& a )
 ///	@return 	static int_precision	-	return a *=b
 ///	@param   "a"	-	Anding operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   &= operator
@@ -1190,7 +1192,7 @@ inline int_precision& int_precision::operator&=( const int_precision& a )
 ///	@param   "lhs"	-	First operand
 ///	@param   "rhs"	-	Second operand
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Add operator for int_precision + <any other type>
@@ -1198,7 +1200,7 @@ inline int_precision& int_precision::operator&=( const int_precision& a )
 ///
 template <class _Ty> inline int_precision operator+( int_precision& lhs, const _Ty& rhs )
    {
-   return int_precision(lhs) += rhs; 
+   return int_precision(lhs) += rhs;
    }
 
 
@@ -1211,11 +1213,11 @@ template <class _Ty> inline int_precision operator+( int_precision& lhs, const _
 ///	@param   "rhs"	-	Second operand
 ///
 /// Description:
-///   Add operator for <any other type> + int_precision 
+///   Add operator for <any other type> + int_precision
 ///
 template <class _Ty> inline int_precision operator+( const _Ty& lhs, const int_precision& rhs )
    {
-   return int_precision(lhs) += rhs; 
+   return int_precision(lhs) += rhs;
    }
 
 
@@ -1223,9 +1225,9 @@ template <class _Ty> inline int_precision operator+( const _Ty& lhs, const int_p
 ///	@date  1/19/2005
 ///	@brief 	operator unary +
 ///	@return 	int_precision	-	a
-///	@param   "a"	-	operand 
+///	@param   "a"	-	operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   Unary + operator
@@ -1242,7 +1244,7 @@ inline int_precision operator+( const int_precision& a )
 ///	@return 	int_precision	-	return the incremented a
 ///	@param   "a"	-	operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   Increment operator
@@ -1259,7 +1261,7 @@ inline int_precision operator++( int_precision& a )
 ///	@return 	int_precision	-	return the a before incrementation
 ///	@param   "a"	-	operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   Postfix Increment operator
@@ -1280,7 +1282,7 @@ inline int_precision operator++( int_precision& a, int )
 ///	@param   "lhs"	-	First operand
 ///	@param   "rhs"	-	Second operand
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Add operator for int_precision - <any other type>
@@ -1288,7 +1290,7 @@ inline int_precision operator++( int_precision& a, int )
 ///
 template <class _Ty> inline int_precision operator-( int_precision& lhs, const _Ty& rhs )
    {
-   return int_precision(lhs) -= rhs; 
+   return int_precision(lhs) -= rhs;
    }
 
 
@@ -1301,22 +1303,22 @@ template <class _Ty> inline int_precision operator-( int_precision& lhs, const _
 ///	@param   "rhs"	-	Second operand
 ///
 /// Description:
-///   Add operator for <any other type> - int_precision 
+///   Add operator for <any other type> - int_precision
 ///
 template <class _Ty> inline int_precision operator-( const _Ty& lhs, const int_precision& rhs )
    {
-   return int_precision(lhs) -= rhs; 
+   return int_precision(lhs) -= rhs;
    }
 
 
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  1/19/2005
-///	@brief 	operator unary - 
+///	@brief 	operator unary -
 ///	@return 	int_precision	-	-a
 ///	@param   "a"	-	operand for sign change
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   Unary - operator
@@ -1328,7 +1330,7 @@ inline int_precision operator-( const int_precision& a )
 
    b = a;
    b.change_sign();
-   
+
    return b;
    }
 
@@ -1338,7 +1340,7 @@ inline int_precision operator-( const int_precision& a )
 ///	@return 	int_precision	-	return the decremented a
 ///	@param   "a"	-	operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   Decrement operator
@@ -1355,7 +1357,7 @@ inline int_precision operator--( int_precision& a )
 ///	@return 	int_precision	-	return the a before decrementation
 ///	@param   "a"	-	operand
 ///
-///	@todo 
+///	@todo
 ///
 /// Description:
 ///   Postfix Decrement operator
@@ -1374,14 +1376,14 @@ int_precision operator--( int_precision& a, int )
 ///	@param   "lhs"	-	First operand
 ///	@param   "rhs"	-	Second operand
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Add operator for int_precision * <any other type>
 ///
 template <class _Ty> inline int_precision operator*( int_precision& lhs, const _Ty& rhs )
    {
-   return int_precision(lhs) *= rhs; 
+   return int_precision(lhs) *= rhs;
    }
 
 
@@ -1394,12 +1396,12 @@ template <class _Ty> inline int_precision operator*( int_precision& lhs, const _
 ///	@param   "rhs"	-	Second operand
 ///
 /// Description:
-///   Add operator for <any other type> * int_precision 
+///   Add operator for <any other type> * int_precision
 ///   no const on the lhs parameter to prevent ambigous overload
 ///
 template <class _Ty> inline int_precision operator*( const _Ty& lhs, const int_precision& rhs )
    {
-   return int_precision(lhs) *= rhs; 
+   return int_precision(lhs) *= rhs;
    }
 
 
@@ -1410,7 +1412,7 @@ template <class _Ty> inline int_precision operator*( const _Ty& lhs, const int_p
 ///	@param   "lhs"	-	First operand
 ///	@param   "rhs"	-	Second operand
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Add operator for int_precision / <any other type>
@@ -1418,7 +1420,7 @@ template <class _Ty> inline int_precision operator*( const _Ty& lhs, const int_p
 ///
 template <class _Ty> inline int_precision operator/( int_precision& lhs, const _Ty& rhs )
    {
-   return int_precision(lhs) /= rhs; 
+   return int_precision(lhs) /= rhs;
    }
 
 
@@ -1431,11 +1433,11 @@ template <class _Ty> inline int_precision operator/( int_precision& lhs, const _
 ///	@param   "rhs"	-	Second operand
 ///
 /// Description:
-///   Add operator for <any other type> / int_precision 
+///   Add operator for <any other type> / int_precision
 ///
 template <class _Ty> inline int_precision operator/( const _Ty& lhs, const int_precision& rhs )
    {
-   return int_precision(lhs) /= rhs; 
+   return int_precision(lhs) /= rhs;
    }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
@@ -1445,14 +1447,14 @@ template <class _Ty> inline int_precision operator/( const _Ty& lhs, const int_p
 ///	@param   "lhs"	-	First operand
 ///	@param   "rhs"	-	Second operand
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Add operator for int_precision % <any other type>
 ///
 template <class _Ty> inline int_precision operator%( int_precision& lhs, const _Ty& rhs )
    {
-   return int_precision(lhs) %= rhs; 
+   return int_precision(lhs) %= rhs;
    }
 
 
@@ -1465,11 +1467,11 @@ template <class _Ty> inline int_precision operator%( int_precision& lhs, const _
 ///	@param   "rhs"	-	Second operand
 ///
 /// Description:
-///   Add operator for <any other type> % int_precision 
+///   Add operator for <any other type> % int_precision
 ///
 template <class _Ty> inline int_precision operator%( const _Ty& lhs, const int_precision& rhs )
    {
-   return int_precision(lhs) %= rhs; 
+   return int_precision(lhs) %= rhs;
    }
 
 ///	@author Henrik Vestermark (hve@hvks.com)
@@ -1479,14 +1481,14 @@ template <class _Ty> inline int_precision operator%( const _Ty& lhs, const int_p
 ///	@param   "lhs"	-	First operand
 ///	@param   "rhs"	-	Second operand
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Add operator for int_precision << <any other type>
 ///
 template <class _Ty> inline int_precision operator<<( int_precision& lhs, const _Ty& rhs )
    {
-   return int_precision(lhs) <<= rhs; 
+   return int_precision(lhs) <<= rhs;
    }
 
 
@@ -1499,11 +1501,11 @@ template <class _Ty> inline int_precision operator<<( int_precision& lhs, const 
 ///	@param   "rhs"	-	Second operand
 ///
 /// Description:
-///   Add operator for <any other type> << int_precision 
+///   Add operator for <any other type> << int_precision
 ///
 template <class _Ty> inline int_precision operator<<(  const _Ty& lhs, const int_precision& rhs )
    {
-   return int_precision(lhs) <<= rhs; 
+   return int_precision(lhs) <<= rhs;
    }
 
 
@@ -1514,14 +1516,14 @@ template <class _Ty> inline int_precision operator<<(  const _Ty& lhs, const int
 ///	@param   "lhs"	-	First operand
 ///	@param   "rhs"	-	Second operand
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   Add operator for int_precision >> <any other type>
 ///
 template <class _Ty> inline int_precision operator>>( int_precision& lhs, const _Ty& rhs )
    {
-   return int_precision(lhs) >>= rhs; 
+   return int_precision(lhs) >>= rhs;
    }
 
 
@@ -1534,11 +1536,11 @@ template <class _Ty> inline int_precision operator>>( int_precision& lhs, const 
 ///	@param   "rhs"	-	Second operand
 ///
 /// Description:
-///   Add operator for <any other type> >> int_precision 
+///   Add operator for <any other type> >> int_precision
 ///
 template <class _Ty> inline int_precision operator>>( const _Ty& lhs, const int_precision& rhs )
    {
-   return int_precision(lhs) >>= rhs; 
+   return int_precision(lhs) >>= rhs;
    }
 
 /*
@@ -1549,7 +1551,7 @@ template <class _Ty> inline int_precision operator>>( const _Ty& lhs, const int_
 ///	@param   "lhs"	-	First operand
 ///	@param   "rhs"	-	Second operand
 ///
-///	@todo  Add to do things	
+///	@todo  Add to do things
 ///
 /// Description:
 ///   And operator for int_precision & <any other type>
@@ -1557,7 +1559,7 @@ template <class _Ty> inline int_precision operator>>( const _Ty& lhs, const int_
 ///
 template <class _Ty> inline int_precision operator&( int_precision& lhs, const _Ty& rhs )
    {
-   return int_precision(lhs) &= rhs; 
+   return int_precision(lhs) &= rhs;
    }
 
 
@@ -1570,11 +1572,11 @@ template <class _Ty> inline int_precision operator&( int_precision& lhs, const _
 ///	@param   "rhs"	-	Second operand
 ///
 /// Description:
-///   Add operator for <any other type> & int_precision 
+///   Add operator for <any other type> & int_precision
 ///
 template <class _Ty> inline int_precision operator&( const _Ty& lhs, const int_precision& rhs )
    {
-   return int_precision(lhs) &= rhs; 
+   return int_precision(lhs) &= rhs;
    }
 */
 
@@ -1591,7 +1593,7 @@ template <class _Ty> inline int_precision operator&( const _Ty& lhs, const int_p
 ///	@brief 			operator==
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1605,7 +1607,7 @@ template <class _Ty> inline bool operator==( int_precision& a, const _Ty& b )
    {int_precision c(b);
    if( _int_precision_compare( const_cast<int_precision&>(a).pointer(), const_cast<int_precision&>(c).pointer() ) == 0 )   // Same return true
       return true;
-   
+
    return false;
    }
 
@@ -1614,7 +1616,7 @@ template <class _Ty> inline bool operator==( int_precision& a, const _Ty& b )
 ///	@brief 			operator==
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1628,7 +1630,7 @@ template <class _Ty> inline bool operator==( const _Ty& a, const int_precision& 
    {int_precision c(a);
   // if( _int_precision_compare( const_cast<int_precision&>(int_precision(c)).pointer(), const_cast<int_precision&>(b).pointer() ) == 0 )   // Same return true
    if( _int_precision_compare( const_cast<int_precision&>(c).pointer(), const_cast<int_precision&>(b).pointer() ) == 0 )    return true;
-    
+
    return false;
    }
 
@@ -1637,7 +1639,7 @@ template <class _Ty> inline bool operator==( const _Ty& a, const int_precision& 
 ///	@brief 			operator<
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1652,8 +1654,8 @@ template <class _Ty> inline bool operator<( int_precision& a, const _Ty& c )
    int sign1, sign2, cmp;
    int_precision b(c);
 
-   sign1 = a.sign(); 
-   sign2 = b.sign(); 
+   sign1 = a.sign();
+   sign2 = b.sign();
 
    // Different signs
    if( sign1 > sign2 )
@@ -1678,7 +1680,7 @@ template <class _Ty> inline bool operator<( int_precision& a, const _Ty& c )
    else
       if( cmp > 0 && sign1 == -1 )
          return true;
-   
+
    return false;
    }
 
@@ -1687,7 +1689,7 @@ template <class _Ty> inline bool operator<( int_precision& a, const _Ty& c )
 ///	@brief 			operator<
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1702,8 +1704,8 @@ template <class _Ty> inline bool operator<( const _Ty& c, const int_precision& b
    int sign1, sign2, cmp;
    int_precision a(c);
 
-   sign1 = a.sign(); 
-   sign2 = b.sign(); 
+   sign1 = a.sign();
+   sign2 = b.sign();
 
    // Different signs
    if( sign1 > sign2 )
@@ -1728,7 +1730,7 @@ template <class _Ty> inline bool operator<( const _Ty& c, const int_precision& b
    else
       if( cmp > 0 && sign1 == -1 )
          return true;
-   
+
    return false;
    }
 
@@ -1738,7 +1740,7 @@ template <class _Ty> inline bool operator<( const _Ty& c, const int_precision& b
 ///	@brief 			operator!=
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1755,7 +1757,7 @@ template <class _Ty> inline bool operator!=( int_precision& a, const _Ty& b )
 ///	@brief 			operator!=
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1772,7 +1774,7 @@ template <class _Ty> inline bool operator!=( const _Ty& a, const int_precision& 
 ///	@brief 			operator>
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1789,7 +1791,7 @@ template <class _Ty> inline bool operator>( int_precision& a, const _Ty& b )
 ///	@brief 			operator>
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1806,7 +1808,7 @@ template <class _Ty> inline bool operator>( const _Ty& a, const int_precision& b
 ///	@brief 			operator<=
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1823,7 +1825,7 @@ template <class _Ty> inline bool operator<=( int_precision& a, const _Ty& b )
 ///	@brief 			operator<=
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1840,7 +1842,7 @@ template <class _Ty> inline bool operator<=( const _Ty& a, const int_precision& 
 ///	@brief 			operator>=
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1857,7 +1859,7 @@ template <class _Ty> inline bool operator>=( int_precision& a, const _Ty& b )
 ///	@brief 			operator>=
 ///	@return 			bool	- 	the boolean value of the operator
 ///	@param "a"	-	First operand number to compare
-///	@param "b"	-	Second operand number to 
+///	@param "b"	-	Second operand number to
 ///
 ///	@todo
 ///
@@ -1868,5 +1870,5 @@ template <class _Ty> inline bool operator>=( const _Ty& a, const int_precision& 
    {
    return a < b ? false: true;
    }
-  
-#endif
+
+}

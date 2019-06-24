@@ -1,0 +1,4 @@
+*.code-workspace
+3rdparty*
+bin*
+build*

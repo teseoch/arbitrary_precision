@@ -1,12 +1,10 @@
-#ifndef INC_INTERVAL
-#define INC_INTERVAL
-
+#pragma once
 /*
  *******************************************************************************
  *
  *
  *                       Copyright (c) 2002-2014
- *                       Future Team Aps 
+ *                       Future Team Aps
  *                       Denmark
  *
  *                       All Rights Reserved
@@ -24,11 +22,11 @@
  *
  *
  * Module name     :   intervalprecision.h
- * Module ID Nbr   :   
+ * Module ID Nbr   :
  * Description     :   Interval Precision arithmetic template class
  *                     Works with the int_precision and float_precision classes
  * --------------------------------------------------------------------------
- * Change Record   :   
+ * Change Record   :
  *
  * Version	Author/Date		Description of changes
  * -------  -----------		----------------------
@@ -41,7 +39,7 @@
  * 01.06	HVE/JUN-30-2014	An error was corrected for interval subtraction of float_preicsion numbers
  *							Also added the method bool contain() for test if a float or interval is included in the interval
  * 01.07	HVE/JUL-6-2014	Corrected an error in /= for the software emulation of of float & double
- * 01.08	HVE/JUL-13-2014	Added Hardware support for interval arithmetic when applicable. Also fix several errors in the 
+ * 01.08	HVE/JUL-13-2014	Added Hardware support for interval arithmetic when applicable. Also fix several errors in the
  *							implementation of sqrt, log, log10, exp and pow functions. Also added new method is_class(), is_empty()
  * 01.09	HVE/JUL-15-2014	Added support for Sin(), Cos() and Tan() interval trigonometric functions.
  * 01.10	HVE/JUL-17-2014	Added support for atan() interval trigonometric function
@@ -56,14 +54,16 @@
 */
 
 
-/* define version string */
-static char _VinterP_[] = "@(#)intervalprecision.h 01.15 -- Copyright (C) Future Team Aps";
-
 #include <float.h>
 #include <algorithm>
 
+namespace arbitrary_precision
+{
+/* define version string */
+static char _VinterP_[] = "@(#)intervalprecision.h 01.15 -- Copyright (C) Future Team Aps";
+
 // HARDWARE_SUPPORT controlled if IEEE754 floating point control can be used for interval arithmetic.
-// if not used interval arithmetic will be handle in software 
+// if not used interval arithmetic will be handle in software
 //#define HARDWARE_SUPPORT
 
 /// The four different interval classification
@@ -71,14 +71,21 @@ static char _VinterP_[] = "@(#)intervalprecision.h 01.15 -- Copyright (C) Future
 /// # POSITIVE		a>=0 && b>0
 /// # NEGATIVE		a<0 && b<=0
 /// # MIXED			a<0 && b>0
-enum int_class { NO_CLASS, ZERO, POSITIVE, NEGATIVE, MIXED };
+enum int_class
+{
+	NO_CLASS,
+	ZERO,
+	POSITIVE,
+	NEGATIVE,
+	MIXED
+};
 
-// 
+//
 // Interval class
 // Realisticly the class Type can be float, double, int_precision, & float_precision
-// Since float and double are done unsing the Intel cpu (H/W) and using "specilization" 
+// Since float and double are done unsing the Intel cpu (H/W) and using "specilization"
 // the int_precision and float_precision is done using the arbitrary precision packages
-// Since their is no way to specific portable ROUND_DOWN and ROUND_UP mode the template class 
+// Since their is no way to specific portable ROUND_DOWN and ROUND_UP mode the template class
 // heavily use specilization. For any other type besides float, double, int_precision and float_precision
 // the operations is not defined
 //
@@ -95,13 +102,13 @@ template<class _IT> class interval {
 	 template <class _X> interval(const _X& x) { low = _IT(x); high = _IT(x); }
 
       // constructor for any other type to _IT. Both up and down conversion possible
-      template<class X> interval( const interval<X>& a ) /*: low(_IT(a.lower())), high( _IT(a.upper())) */ 
+      template<class X> interval( const interval<X>& a ) /*: low(_IT(a.lower())), high( _IT(a.upper())) */
 	  {
 		/*  int is = sizeof(_IT), js = sizeof(X);
 		  cout << "_IT=" << typeid(_IT).name() << " X=" << typeid(X).name() << endl;
 		  fpdown(); low = _IT(a.lower());
 		  fpup(); high = _IT(a.upper());
-		  fpnear(); 
+		  fpnear();
 		  if (typeid(_IT) == typeid(double) && typeid(X)==typeid(float))  // upscaling float to double
 			  {
 			  double u = high;
@@ -112,7 +119,7 @@ template<class _IT> class interval {
 		  if (a.lower() < a.upper()) { fpdown();  low = _IT(a.lower()); fpup();  high = _IT(a.upper()); fpnear();  }
 		  else { fpdown();  low = _IT(a.upper()); fpup();  high = _IT(a.lower()); fpnear(); }
 	  }
-	 
+
       // Coordinate functions
       _IT upper() const					{ return high; }
       _IT lower() const					{ return low; }
@@ -122,13 +129,13 @@ template<class _IT> class interval {
       _IT center() const				{ return ( high + low ) / _IT(2); }
       _IT radius() const				{ _IT r; r =( high - low ) / _IT(2); if( r < _IT(0) ) r = -r; return r; }
 	  _IT width() const					{ _IT r; r = high - low; if (r < _IT(0)) r = -r; return r; }
-	
+
 	  bool contain_zero() const			{ return low <= _IT(0) && _IT(0) <= high; }  // Obsolete. use contains() instead.
 	  bool contain( const _IT& f=_IT(0)){ return low <= f && f <= high;  }
 	  bool contain(const interval<_IT>& i) { return low <= i.lower() && i.upper() <= high; }
 	  bool is_empty() const				{ return high < low; }
-	
-	  enum int_class is_class() const	{ 
+
+	  enum int_class is_class() const	{
 										if (low == _IT(0) && high == _IT(0)) return ZERO;
 										if (low >= _IT(0) && high > _IT(0)) return POSITIVE;
 										if (low < _IT(0) && high <= _IT(0)) return NEGATIVE;
@@ -140,16 +147,16 @@ template<class _IT> class interval {
 	//  int_precision to_int_precision() const		{ std::string s = _float_precision_ftoainteger(this); return (int_precision)((char *)s.c_str()); }
 
 	  // Operators
-	  operator short() const			{ return (short)((high + low) / _IT(2)); }				// Conversion to short 	 
-	  operator int() const				{ return (int)( ( high + low ) / _IT(2) ); }			// Conversion to int 
-	  operator long() const				{ return (long)((high + low) / _IT(2)); }				// Conversion to long 
-	  operator unsigned short() const	{ return (unsigned short)((high + low) / _IT(2)); }		// Conversion to unsigned short 	 
-	  operator unsigned int() const		{ return (unsigned int)((high + low) / _IT(2)); }		// Conversion to unsigned int 
-	  operator unsigned long() const	{ return (unsigned long)((high + low) / _IT(2)); }		// Conversion to unsigned long 
-	  operator double() const			{ return (double)( ( high + low ) / _IT(2) ); }			// Conversion to double 
-	  operator float() const			{ return high == low? (float)low : (float)((high + low) / _IT(2)); }				// Conversion to float 
-	  operator int_precision() const	{ return (int_precision)((high + low) / _IT(2)); }		// Conversion to int_precision 
-	  operator float_precision() const	{ return (float_precision)((high + low) / _IT(2)); }	// Conversion to float_precision 
+	  operator short() const			{ return (short)((high + low) / _IT(2)); }				// Conversion to short
+	  operator int() const				{ return (int)( ( high + low ) / _IT(2) ); }			// Conversion to int
+	  operator long() const				{ return (long)((high + low) / _IT(2)); }				// Conversion to long
+	  operator unsigned short() const	{ return (unsigned short)((high + low) / _IT(2)); }		// Conversion to unsigned short
+	  operator unsigned int() const		{ return (unsigned int)((high + low) / _IT(2)); }		// Conversion to unsigned int
+	  operator unsigned long() const	{ return (unsigned long)((high + low) / _IT(2)); }		// Conversion to unsigned long
+	  operator double() const			{ return (double)( ( high + low ) / _IT(2) ); }			// Conversion to double
+	  operator float() const			{ return high == low? (float)low : (float)((high + low) / _IT(2)); }				// Conversion to float
+	  operator int_precision() const	{ return (int_precision)((high + low) / _IT(2)); }		// Conversion to int_precision
+	  operator float_precision() const	{ return (float_precision)((high + low) / _IT(2)); }	// Conversion to float_precision
 
       _IT *ref_lower()					{ return &low; }
       _IT *ref_upper()					{ return &high; }
@@ -181,8 +188,8 @@ template <class _IT, class _X> inline interval<_IT> operator+( const _X&, const 
 inline interval<float_precision> operator+(const interval<float_precision>&, const float_precision&);	// Specialization for interval<float_precision> and float_precision
 inline interval<float_precision> operator+(const float_precision&, const interval<float_precision>&);	// Specialization for ifloat_precision and interval<float_precision>
 
-template<class _IT> interval<_IT> operator+( const interval<_IT>&, const interval<_IT>& ); 
-template<class _IT> interval<_IT> operator+( const interval<_IT>& );									// Unary 
+template<class _IT> interval<_IT> operator+( const interval<_IT>&, const interval<_IT>& );
+template<class _IT> interval<_IT> operator+( const interval<_IT>& );									// Unary
 
 // Arithmetic - Binary and Unary
 template <class _IT, class _X> inline interval<_IT> operator-(const interval<_IT>&, const _X&);
@@ -330,7 +337,7 @@ template<class _Ty> inline std::ostream& operator<<( std::ostream& strm, interva
 
 // Input operator >>
 //
-template<class _Ty> inline std::istream& operator>>( std::istream& strm, interval<_Ty>& c ) 
+template<class _Ty> inline std::istream& operator>>( std::istream& strm, interval<_Ty>& c )
    {
    _Ty l, u; char ch;
    if( strm >> ch && ch != '[')
@@ -339,18 +346,18 @@ template<class _Ty> inline std::istream& operator>>( std::istream& strm, interva
       if( strm >> l >> ch && ch != ',')
 	      if( ch == ']')
 	         u = l;
-	      else 
+	      else
             strm.putback( ch ); // strm.setstate(std::ios::failbit);
 	   else
          if( strm >> u >> ch && ch != ']')
 	         strm.putback( ch ); //, strm.setstate(ios_base::failbit);
-	
+
    if(!strm.fail())
 	   c = interval<_Ty>( l, u );
 
    return strm;
    }
- 
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -370,7 +377,7 @@ template<class _IT> inline interval<_IT>& interval<_IT>::operator=( const interv
    return *this;
    }
 
-// += operator. Works all other classes. 
+// += operator. Works all other classes.
 // Please note that this is for all integer classes. interval<int>, interval<long>, interval<int_precision>
 // were there os no loss of precision
 //
@@ -389,7 +396,7 @@ inline interval<float_precision>& interval<float_precision>::operator+=( const i
    low += a.lower();
    high.mode( ROUND_UP );
    high += a.upper();
-   
+
    return *this;
    }
 
@@ -440,7 +447,7 @@ inline interval<double>& interval<double>::operator+=( const interval<double>& a
 	return *this;
 	}
 
-// -= operator. Works all other classes. 
+// -= operator. Works all other classes.
 // Please note that this is for all integer classes. interval<int>, interval<long>, interval<int_precision>
 // were there is no loss of precision
 //
@@ -459,7 +466,7 @@ inline interval<float_precision>& interval<float_precision>::operator-=( const i
    low -= a.upper();
    high.mode( ROUND_UP );
    high -= a.lower();
-   
+
    return *this;
    }
 
@@ -509,7 +516,7 @@ inline interval<double>& interval<double>::operator-=( const interval<double>& a
 	return *this;
 	}
 
-// Works all other classes. 
+// Works all other classes.
 // Please note that this is for all interger classes. interval<int>, interval<long>, interval<int_precision>
 // were there is no loss of precision
 // Instead of doing the mindless low = MIN(low*a.high, low*a.low,high*a.low,high*a.high) and
@@ -519,7 +526,7 @@ inline interval<double>& interval<double>::operator-=( const interval<double>& a
 //    +     +     +     +        +  +  [ low*a.low, high*a.high ]
 //    +     +     -     +        -  +  [ high*a.low, high*a.high ]
 //    +     +     -     -        -  -  [ high*a.low, low*a.high ]
-//    -     +     +     +        -  +  [ low*a.high, high*a.high ]  
+//    -     +     +     +        -  +  [ low*a.high, high*a.high ]
 //    -     +     -     +        -  +  [ MIN(low*a.high,high*a.low), MAX(low*a.low,high*a.high) ]
 //    -     +     -     -        -  -  [ high*a.low, low*a.low ]
 //    -     -     +     +        -  -  [ low*a.high, high,a.low ]
@@ -530,7 +537,7 @@ template<class _IT> inline interval<_IT>& interval<_IT>::operator*=( const inter
    {
    _IT l, h, t;
 
-   if( low >= _IT(0) ) // 
+   if( low >= _IT(0) ) //
       { // both low and high >= 0
       if( a.lower() >= _IT(0) )
          { // a.low >=0, a.high >= 0
@@ -544,7 +551,7 @@ template<class _IT> inline interval<_IT>& interval<_IT>::operator*=( const inter
             h = high * a.upper();
             }
          else
-            { // a.low and a.high < 0 
+            { // a.low and a.high < 0
             l = high * a.lower();
             h = low * a.upper();
             }
@@ -564,13 +571,13 @@ template<class _IT> inline interval<_IT>& interval<_IT>::operator*=( const inter
                h = high * a.upper(); if ( h < ( t = low * a.lower() ) ) h = t;
                }
             else
-               { // a.low and a.high < 0 
+               { // a.low and a.high < 0
                l = high * a.lower();
                h = low * a.lower();
                }
          }
       else
-         { // low and high are < 0 
+         { // low and high are < 0
          if( a.lower() >= _IT(0) )
             { // a.low >=0, a.high >= 0
             l = low * a.upper();
@@ -579,11 +586,11 @@ template<class _IT> inline interval<_IT>& interval<_IT>::operator*=( const inter
          else
             if( a.upper() >= _IT(0) )
                {  //  a.low < 0, a.high >= 0
-               l = low * a.upper(); 
+               l = low * a.upper();
                h = low * a.lower();
                }
             else
-               { // a.low and a.high < 0 
+               { // a.low and a.high < 0
                l = high * a.upper();
                h = low * a.lower();
                }
@@ -603,13 +610,13 @@ inline interval<float_precision>& interval<float_precision>::operator*=( const i
    float_precision l, h, t;
 
    l.precision( low.precision() );
-   h.precision( low.precision() );   
+   h.precision( low.precision() );
    t.precision( low.precision() );
 
    l.mode( ROUND_DOWN );
    h.mode( ROUND_UP );
 
-   if( low.sign() > 0 ) // 
+   if( low.sign() > 0 ) //
       { // both low and high >= 0
       if( a.lower().sign() > 0 )
          { // a.low >=0, a.high >= 0
@@ -623,7 +630,7 @@ inline interval<float_precision>& interval<float_precision>::operator*=( const i
             h = high; h *= a.upper();
             }
          else
-            { // a.low and a.high < 0 
+            { // a.low and a.high < 0
             l = high; l *= a.lower();
             h = low;  h *= a.upper();
             }
@@ -645,13 +652,13 @@ inline interval<float_precision>& interval<float_precision>::operator*=( const i
                h = high; h *= a.upper(); if( h < ( t = low, t *= a.lower() ) ) h = t;
                }
             else
-               { // a.low and a.high < 0 
+               { // a.low and a.high < 0
                l = high; l *= a.lower();
                h = low;  h *= a.lower();
                }
          }
       else
-         { // low and high are < 0 
+         { // low and high are < 0
          if( a.lower().sign() > 0 )
             { // a.low >=0, a.high >= 0
             l = low;  l *= a.upper();
@@ -660,11 +667,11 @@ inline interval<float_precision>& interval<float_precision>::operator*=( const i
          else
             if( a.upper().sign() > 0 )
                {  //  a.low < 0, a.high >= 0
-               l = low; l *= a.upper(); 
+               l = low; l *= a.upper();
                h = low; h *= a.lower();
                }
             else
-               { // a.low and a.high < 0 
+               { // a.low and a.high < 0
                l = high; l *= a.upper();
                h = low; h *= a.lower();
                }
@@ -686,7 +693,7 @@ inline interval<float>& interval<float>::operator*=( const interval<float>& a )
 #ifdef HARDWARE_SUPPORT
 	float l, h, t;
 
-	if (low >= 0 ) // 
+	if (low >= 0 ) //
 	{ // both low and high >= 0
 		if (a.lower() >= 0 )
 		{ // a.low >=0, a.high >= 0
@@ -730,7 +737,7 @@ inline interval<float>& interval<float>::operator*=( const interval<float>& a )
 			h = high * a.upper(); if (h < (t = low * a.lower())) h = t;
 		}
 		else
-		{ // a.low and a.high < 0 
+		{ // a.low and a.high < 0
 			fpdown();
 			l = high * a.lower();
 			fpup();
@@ -738,7 +745,7 @@ inline interval<float>& interval<float>::operator*=( const interval<float>& a )
 		}
 	}
 	else
-	{ // low and high are < 0 
+	{ // low and high are < 0
 		if (a.lower() >= 0 )
 		{ // a.low >=0, a.high >= 0
 			fpdown();
@@ -755,7 +762,7 @@ inline interval<float>& interval<float>::operator*=( const interval<float>& a )
 			h = low * a.lower();
 		}
 		else
-		{ // a.low and a.high < 0 
+		{ // a.low and a.high < 0
 			fpdown();
 			l = high * a.upper();
 			fpup();
@@ -786,7 +793,7 @@ inline interval<double>& interval<double>::operator*=( const interval<double>& a
 #ifdef HARDWARE_SUPPORT
 	double l, h, t;
 
-	if (low >= 0) // 
+	if (low >= 0) //
 	{ // both low and high >= 0
 		if (a.lower() >= 0)
 		{ // a.low >=0, a.high >= 0
@@ -830,7 +837,7 @@ inline interval<double>& interval<double>::operator*=( const interval<double>& a
 			h = high * a.upper(); if (h < (t = low * a.lower())) h = t;
 		}
 		else
-		{ // a.low and a.high < 0 
+		{ // a.low and a.high < 0
 			fpdown();
 			l = high * a.lower();
 			fpup();
@@ -838,7 +845,7 @@ inline interval<double>& interval<double>::operator*=( const interval<double>& a
 		}
 	}
 	else
-	{ // low and high are < 0 
+	{ // low and high are < 0
 		if (a.lower() >= 0)
 		{ // a.low >=0, a.high >= 0
 			fpdown();
@@ -855,7 +862,7 @@ inline interval<double>& interval<double>::operator*=( const interval<double>& a
 			h = low * a.lower();
 		}
 		else
-		{ // a.low and a.high < 0 
+		{ // a.low and a.high < 0
 			fpdown();
 			l = high * a.upper();
 			fpup();
@@ -894,7 +901,7 @@ template<class _IT> inline interval<_IT>& interval<_IT>::operator/=( const inter
    low = c.lower();
    high = c.upper();
 
-   return *this; 
+   return *this;
    }
 
 // Specilization for float_precision and /=
@@ -1024,15 +1031,15 @@ inline interval<int>& interval<int>::operator/=( const interval<int>& b )
    low = (int)floor( c.lower() );
    high = (int)ceil( c.upper() );
 
-   return *this; 
+   return *this;
    }
 
-// Works on all classes. 
+// Works on all classes.
 // Return the intersection
 //
 template<class _IT> inline interval<_IT>& interval<_IT>::operator&=(const interval<_IT>& a)
 	{
-	if (a.lower() > low ) 
+	if (a.lower() > low )
 		low = a.lower();
 	if (a.upper() < high)
 		high = a.upper();
@@ -1044,7 +1051,7 @@ template<class _IT> inline interval<_IT>& interval<_IT>::operator&=(const interv
 	return *this;
 	}
 
-// Works on all classes. 
+// Works on all classes.
 // Return the union
 //
 template<class _IT> inline interval<_IT>& interval<_IT>::operator|=(const interval<_IT>& a)
@@ -1066,8 +1073,8 @@ template<class _IT> inline interval<_IT>& interval<_IT>::operator|=(const interv
 		}
 	}
 
-	
-// Works on all classes. 
+
+// Works on all classes.
 // Return the set minus
 //
 template<class _IT> inline interval<_IT>& interval<_IT>::operator^=(const interval<_IT>& a)
@@ -1128,7 +1135,7 @@ template<class _IT,class _X> inline interval<_IT> operator+(const interval<_IT>&
 	interval<_IT> c(a);
 
 	c += interval<_IT>(_IT(b));
-	return c; 
+	return c;
 	}
 
 // Binary + operator
@@ -1344,7 +1351,7 @@ template<class _IT> inline interval<_IT> operator/( const interval<_IT>& a, cons
 	  c = interval<_IT>(1,1);
    else
       c /= b;
-   
+
    return c;
    }
 
@@ -1500,7 +1507,7 @@ inline float tofloat(const interval<double>& di, enum round_mode rm )
 		case ROUND_UP: d = di.upper();  fpup();  break;
 		}
 
-	fres = (float)d;  
+	fres = (float)d;
 	fpnear();
 	return fres;
 	}
@@ -1601,7 +1608,7 @@ inline double sqrtdouble( double d, enum round_mode rm )
 	case ROUND_UP: fpup(); break;
 	}
 
-	_asm 
+	_asm
 		{
 		fld qword ptr[sq];  Load lower into floating point stack
 		fsqrt;                 Calculate sqrt
@@ -1698,11 +1705,11 @@ inline float log10float(float f, enum round_mode rm)
 #endif
 
 // Specilization for sqrt(float_precision)
-// 
+//
 inline interval<float_precision> sqrt( const interval<float_precision>& x )
    {
    float_precision l, u;
-   
+
    l.assign( x.lower() );  // Assign value, precision and mode
    l.mode( ROUND_DOWN );
    l = sqrt( l );
@@ -1735,14 +1742,14 @@ inline interval<float> sqrt( const interval<float>& x )
 // sqrt for double using managed code.
 //
 inline interval<double> sqrt( const interval<double>& x )
-   { 
+   {
    double lower, upper;
 #ifdef HARDWARE_SUPPORT
 	lower = sqrtdouble( x.lower(), ROUND_DOWN );
 	upper = sqrtdouble( x.upper(), ROUND_UP );
 #else
 	interval<float_precision> fx(x);
-   
+
    fx=sqrt(fx);
    lower = todouble(fx, ROUND_DOWN);
    upper = todouble(fx, ROUND_UP);
@@ -1753,11 +1760,11 @@ inline interval<double> sqrt( const interval<double>& x )
 
 
 // Specilization for log float_precision
-// 
+//
 inline interval<float_precision> log( const interval<float_precision>& x )
    {
    float_precision l, u;
-   
+
    l.assign( x.lower() );  // Assign value, precision and mode
    l.mode( ROUND_DOWN );
    l = log( l );
@@ -1808,11 +1815,11 @@ inline interval<double> log( const interval<double>& x )
 
 
 // Specilization for log float_precision
-// 
+//
 inline interval<float_precision> log10( const interval<float_precision>& x )
    {
    float_precision l, u;
-   
+
    l.assign( x.lower() );  // Assign value, precision and mode
    l.mode( ROUND_DOWN );
    l = log10( l );
@@ -1847,14 +1854,14 @@ inline interval<float> log10( const interval<float>& x )
 // log10 for double using managed code.
 //
 inline interval<double> log10( const interval<double>& x )
-   {   
+   {
 	double lower, upper;
 #ifdef HARDWARE_SUPPORT
 lower = log10double( x.lower(), ROUND_DOWN);
 upper = log10double( x.upper(), ROUND_UP);
 #else
 	interval<float_precision> fx(x);
- 
+
 	fx=log10(fx);
 	lower = todouble(fx, ROUND_DOWN);
 	upper = todouble(fx, ROUND_UP);
@@ -1862,13 +1869,13 @@ upper = log10double( x.upper(), ROUND_UP);
    return interval<double>( lower, upper );
    }
 
-   
+
 // Specilization for exp float_precision
-// 
+//
 inline interval<float_precision> exp( const interval<float_precision>& x )
    {
    float_precision l, u;
-   
+
    l.assign( x.lower() );  // Assign value, precision and mode
    l.mode( ROUND_DOWN );
    l = exp( l );
@@ -1888,7 +1895,7 @@ inline interval<float> exp2( const interval<float>& x )
    {
 	interval<float_precision> fx(x);
    float lower, upper;
-   
+
    fx=exp(fx);
    lower = tofloat(fx, ROUND_DOWN);
    upper = tofloat(fx, ROUND_UP);
@@ -1901,7 +1908,7 @@ inline interval<double> exp2( const interval<double>& x )
    {
 	interval<float_precision> fx(x);
    double lower, upper;
-   
+
    fx=exp(fx);
    lower = todouble(fx, ROUND_DOWN);
    upper = todouble(fx, ROUND_UP);
@@ -1916,7 +1923,7 @@ inline interval<double> exp2( const interval<double>& x )
 // Use a taylor series until their is no more change in the result
 // exp(x) == 1 + x + x^2/2!+x^3/3!+....
 // Equivalent with the same standard C function call
-// use argument reduction via exp(x)=(exp(x/2^k)2^k	
+// use argument reduction via exp(x)=(exp(x/2^k)2^k
 // And use Brent enhancement using the double formula:
 // expm(x)=exp(x)-1 && expm(2x)=expm(x)(2+expm(x)) on the backend to preseve
 // loss of significance digits
@@ -1928,7 +1935,7 @@ inline interval<double> exp(const interval<double>& x)
 	interval<double> c, res, p0, old;
 	const interval<double> c1(1), c2(2);
 
-	c = x; 
+	c = x;
 	if (x.is_class() == NEGATIVE)
 		c = abs(c);
 
@@ -1950,7 +1957,7 @@ inline interval<double> exp(const interval<double>& x)
 		p0 *= ( c / interval<double>((double)i));
 		res += p0;
 		}
-	
+
 	// Brent enhancement avoid loss of significant digits when x is small.
 	if (k>0)
 		{
@@ -1962,7 +1969,7 @@ inline interval<double> exp(const interval<double>& x)
 
 	if (x.is_class() == NEGATIVE)
 		res = c1 / res;
-	
+
 	return res;
 #else
 	interval<float_precision> fx(x);
@@ -2002,7 +2009,7 @@ inline interval<float> exp(const interval<float>& x)
 }
 
 // Specilization for pow float_precision
-// 
+//
 inline interval<float_precision> pow( const interval<float_precision>& x, const float_precision& y )
    {
    interval<float_precision> c(x);
@@ -2019,9 +2026,9 @@ inline interval<float_precision> pow( const interval<float_precision>& x, const 
 // MSC pow() does not allow rounding control
 // So we have to do it manually
 // x^y == exp( y * ln( x ) ) );
-// To avoid loss of precision we actually perform the operation using double and then 
+// To avoid loss of precision we actually perform the operation using double and then
 // convert the result back to float. This is consistent with the pow() that only takes double as an argument.
-// 
+//
 inline interval<float> pow(const interval<float>& x, const float y)
 	{
 	interval<double> c(x);
@@ -2043,7 +2050,7 @@ inline interval<float> pow(const interval<float>& x, const float y)
 // MSC pow() does not alllow rounding control
 // So we have to do it manually
 // x^y == exp( y * ln( x ) ) );
-// 
+//
 inline interval<double> pow(const interval<double>& x, const double y)
 	{
 	interval<double> c;
@@ -2099,7 +2106,7 @@ inline interval<float> int_pifloat()
 	}
 
 // Specilization for constant PI float_precision
-// 
+//
 inline interval<float_precision> int_pi(const unsigned int p = float_precision_ctrl.precision() )
 	{
 	float_precision fx(0,p+1), l(0,p), u(0,p);
@@ -2145,7 +2152,7 @@ inline interval<float> int_ln2float()
 	}
 
 // Specilization for constant LN2 float_precision
-// 
+//
 inline interval<float_precision> int_ln2(const unsigned int p = float_precision_ctrl.precision())
 	{
 	float_precision fx(0, p + 1), l(0, p), u(0, p);
@@ -2191,7 +2198,7 @@ inline interval<float> int_ln10float()
 	}
 
 // Specilization for constant LN10 float_precision
-// 
+//
 inline interval<float_precision> int_ln10(const unsigned int p = float_precision_ctrl.precision() )
 	{
 	float_precision fx(0, p + 2), l(0, p), u(0, p);
@@ -2337,9 +2344,9 @@ inline double atandouble(double d, enum round_mode rm)
 		{
 		fld qword ptr[res];		Load lower into floating point stack
 		fld1;					Load 1.0 on top of stack
-		fpatan;					Calculate tan			
+		fpatan;					Calculate tan
 		fstp qword ptr[res];	Store result
-		}	
+		}
 	fpnear();
 
 	return res;
@@ -2359,7 +2366,7 @@ inline float atanfloat(float f, enum round_mode rm)
 #endif
 
 // Specilization for sin float_precision
-// 
+//
 inline interval<float_precision> sin(const interval<float_precision>& x)
 {
 	float_precision l, u;
@@ -2412,7 +2419,7 @@ inline interval<double> sin(const interval<double>& x)
 }
 
 // Specilization for cos float_precision
-// 
+//
 inline interval<float_precision> cos(const interval<float_precision>& x)
 {
 	float_precision l, u;
@@ -2465,7 +2472,7 @@ inline interval<double> cos(const interval<double>& x)
 }
 
 // Specilization for tan float_precision
-// 
+//
 inline interval<float_precision> tan(const interval<float_precision>& x)
 {
 	float_precision l, u;
@@ -2518,7 +2525,7 @@ inline interval<double> tan(const interval<double>& x)
 }
 
 // Specilization for arctan float_precision
-// 
+//
 inline interval<float_precision> atan(const interval<float_precision>& x)
 {
 	float_precision l, u;
@@ -2706,7 +2713,7 @@ inline interval<float> asin(const interval<float>& x)
 }
 
 // Specilization for arcsin float_precision
-// 
+//
 inline interval<float_precision> asin(const interval<float_precision>& x)
 	{
 	float_precision l, u;
@@ -2749,7 +2756,7 @@ inline interval<float> acos(const interval<float>& x)
 	}
 
 // Specilization for arcsin float_precision
-// 
+//
 inline interval<float_precision> acos(const interval<float_precision>& x)
 	{
 	float_precision l, u;
@@ -2772,4 +2779,4 @@ inline interval<float_precision> acos(const interval<float_precision>& x)
 ///
 //////////////////////////////////////////////////////////////////////////////////////
 
-#endif
+}
