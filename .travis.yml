@@ -1,7 +1,6 @@
 dist: trusty
 sudo: required
 language: cpp
-cache: ccache
 addons:
   apt:
     sources:
@@ -12,9 +11,6 @@ addons:
     - xorg-dev
     - libglu1-mesa-dev
     - libsuitesparse-dev
-  homebrew:
-    packages:
-    - ccache
 matrix:
   include:
   - os: linux
@@ -38,10 +34,7 @@ matrix:
     - MATRIX_EVAL="export CONFIG=Debug"
 
 install:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export PATH="/usr/local/opt/ccache/libexec:$PATH"; fi
 - eval "${MATRIX_EVAL}"
-- ccache --max-size=5.0G
-- ccache -V && ccache --show-stats && ccache --zero-stats
 
 script:
 - mkdir build
@@ -49,5 +42,4 @@ script:
 - cmake -DCMAKE_BUILD_TYPE=$CONFIG ..
 - make -j2
 - make test
-- ccache --show-stats
 - cd ..
