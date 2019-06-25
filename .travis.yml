@@ -1,6 +1,12 @@
 dist: trusty
 sudo: required
 language: cpp
+environment:
+  APPVEYOR_RDP_PASSWORD: ApPAss126.
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 addons:
   apt:
     sources:
