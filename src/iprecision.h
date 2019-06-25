@@ -260,8 +260,10 @@ class int_precision
       int_precision( unsigned long );		// When initialized through an unsigned long
       int_precision( const char * );		// When initialized through a char string
 	  int_precision( const std::string&  );	// When initialized through a std::string
-	  int_precision( const int64_t );		// When initialized through a 64 bit int
+#ifndef __linux__
+     int_precision( const int64_t );		// When initialized through a 64 bit int
 	  int_precision( const uint64_t );		// When initialized through a 64 bit unsinged int
+#endif
 	  int_precision( const int_precision& s) : mNumber(s.mNumber) {}  // When initialized through another int_precision
 
 
@@ -559,10 +561,12 @@ inline int_precision::int_precision( unsigned long i )
 ///   The input integer is always BASE_10
 ///   Only use core base functions to create multi precision numbers
 //
+#ifndef __linux__
 inline int_precision::int_precision( int64_t i)
 	{
 	mNumber = i64to_precision_string( (uint64_t)i, true);
 	}
+#endif
 
 
 ///	@author Henrik Vestermark (hve@hvks.com)
@@ -580,10 +584,12 @@ inline int_precision::int_precision( int64_t i)
 ///   The input integer is always BASE_10
 ///   Only use core base functions to create multi precision numbers
 //
-inline int_precision::int_precision( uint64_t i)
+#ifndef __linux__
+   inline int_precision::int_precision(uint64_t i)
 	{
 	mNumber = i64to_precision_string( i, false);
 	}
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

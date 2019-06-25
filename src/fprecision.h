@@ -290,8 +290,10 @@ class float_precision {
       explicit float_precision( unsigned int, unsigned int, enum round_mode );		// When initialized through a unsigned int
       explicit float_precision( long, unsigned int, enum round_mode );				// When initialized through a long
       explicit float_precision( unsigned long, unsigned int, enum round_mode );		// When initialized through a unsigned long
-	  explicit float_precision( int64_t, unsigned int, enum round_mode);				// When initialized through a int64_t
+#ifndef __linux__
+     explicit float_precision( int64_t, unsigned int, enum round_mode);				// When initialized through a int64_t
 	  explicit float_precision( uint64_t, unsigned int, enum round_mode);			// When initialized through a uint64_t
+#endif
       explicit float_precision( double, unsigned int, enum round_mode );				// When initialized through a double
       explicit float_precision( const char *, unsigned int, enum round_mode );		// When initialized through a char string
 	  explicit float_precision( const std::string&, unsigned int, enum round_mode);	// When initialized through a std::string
@@ -692,6 +694,7 @@ inline float_precision::float_precision( unsigned long i, unsigned int p = float
 ///   The input integer is always BASE_10
 ///   Only use core base functions to create multi precision numbers
 //
+#ifndef __linux__
 inline float_precision::float_precision( int64_t i, unsigned int p = float_precision_ctrl.precision(), enum round_mode m = float_precision_ctrl.mode())
 	{
 	int sign;
@@ -710,7 +713,7 @@ inline float_precision::float_precision( int64_t i, unsigned int p = float_preci
 	mExpo += _float_precision_rounding(&number, sign, mPrec, mRmode);    // Perform rounding
 	mNumber = SIGN_STRING(sign) + number;            // Build number
 	}
-
+#endif
 
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  7/NOV/2016
@@ -729,6 +732,7 @@ inline float_precision::float_precision( int64_t i, unsigned int p = float_preci
 ///   The input integer is always BASE_10
 ///   Only use core base functions to create multi precision numbers
 //
+#ifndef __linux__
 inline float_precision::float_precision( uint64_t i, unsigned int p = float_precision_ctrl.precision(), enum round_mode m = float_precision_ctrl.mode())
 	{
 	int sign;
@@ -747,7 +751,7 @@ inline float_precision::float_precision( uint64_t i, unsigned int p = float_prec
 	mExpo += _float_precision_rounding(&number, sign, mPrec, mRmode);    // Perform rounding
 	mNumber = SIGN_STRING(sign) + number;            // Build number
 	}
-
+#endif
 ///	@author Henrik Vestermark (hve@hvks.com)
 ///	@date  1/21/2005
 ///	@brief 		string constructor for float_precision
