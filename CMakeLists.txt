@@ -44,9 +44,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 		string(REPLACE /MD /MT CMAKE_C_FLAGS_${config} "${CMAKE_C_FLAGS_${config}}")
 		string(REPLACE /MD /MT CMAKE_CXX_FLAGS_${config} "${CMAKE_CXX_FLAGS_${config}}")
 	endforeach()
-else()
-	# If _INT_PRECESION_FAST_DIV_REM is defined it will use a magnitude faster div and rem integer operation.
-	target_compile_definitions(${PROJECT_NAME} PUBLIC "-D_INT_PRECISSION_FAST_DIV_REM")
 endif()
 
 ################################################################################
@@ -68,6 +65,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)
 # Use C++14
 target_compile_features(${PROJECT_NAME} PUBLIC ${CXX14_FEATURES})
 
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	# If _INT_PRECESION_FAST_DIV_REM is defined it will use a magnitude faster div and rem integer operation.
+	target_compile_definitions(${PROJECT_NAME} PUBLIC "-D_INT_PRECISSION_FAST_DIV_REM")
+endif()
 
 
 # Other sources
