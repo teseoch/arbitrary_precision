@@ -26,5 +26,5 @@ build_script:
   - msbuild %MSBuildOptions% ArbitraryPrecision.sln
 
 test_script:
-  - cd c:\projects\arbitrary_precision\build\tests
+  - cd c:\projects\arbitrary_precision\build\tests\Debug
   - .\unit_tests.exe
