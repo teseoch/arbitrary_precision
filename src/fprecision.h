@@ -279,8 +279,9 @@ class float_precision {
 	  float_precision()							{ mRmode = float_precision_ctrl.mode();
 												mPrec = float_precision_ctrl.precision();
 												mExpo = 0;
-												mNumber = "+" + FCHARACTER(0);            // Build number
-												}
+                                    mNumber = "+";
+                                    mNumber += FCHARACTER(0); // Build number
+                                    }
       explicit float_precision( char, unsigned int, enum round_mode );				// When initialized through a char
       explicit float_precision( unsigned char, unsigned int, enum round_mode );		// When initialized through a unsigned char
       explicit float_precision( short, unsigned int, enum round_mode );				// When initialized through a short
