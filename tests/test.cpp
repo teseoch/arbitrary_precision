@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-#include <catch.hpp>
 #include <iostream>
+#include <cassert>
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <arbitraryprecision/fprecision.h>
@@ -9,7 +9,7 @@ using namespace arbitrary_precision;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_CASE("10", "[test]")
+int main(int argc, char const *argv[])
 {
 	for (int n_digits = 10; n_digits <= 100; n_digits+=10)
 	{
@@ -21,7 +21,9 @@ TEST_CASE("10", "[test]")
 		std::cout << res << std::endl;
 		std::cout << prec << std::endl;
 
-		REQUIRE(res.precision() == n_digits);
-		// REQUIRE(prec == n_digits);
+		assert(res.precision() == n_digits);
+		assert(prec == n_digits);
 	}
+
+	return EXIT_SUCCESS;
 }

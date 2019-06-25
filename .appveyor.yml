@@ -21,4 +21,5 @@ build_script:
   - msbuild %MSBuildOptions% ArbitraryPrecision.sln
 
 test_script:
-  - ctest -C %config% --verbose --output-on-failure -j 2
+  - cd c:\projects\arbitrary_precision\build\tests
+  - .\unit_tests.exe
