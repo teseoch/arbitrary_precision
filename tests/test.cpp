@@ -19,9 +19,11 @@ int main(int argc, char const *argv[])
 		float_precision num1(1., n_digits);
 		float_precision num2(3., n_digits);
 
-		auto res = num1 / num2 * float_precision(2., n_digits) - float_precision(2, n_digits) / float_precision(3., n_digits);
+		float_precision res(0, n_digits);
+
+		res = num1 / num2 * float_precision(2., n_digits) - float_precision(2, n_digits) / float_precision(3., n_digits);
 		const int prec = -log10(abs(res));
-		std::cout << res << std::endl;
+		std::cout << res << " " << res.precision() << std::endl;
 		std::cout << prec << std::endl;
 
 		assert(res.precision() == n_digits);
