@@ -39,7 +39,14 @@ int main(int argc, char const *argv[])
 	}
 
 	{
+		int n_digits = 50;
 		interval<float_precision> tmp;
+		tmp.ref_lower()->precision(n_digits);
+		tmp.ref_upper()->precision(n_digits);
+		tmp = float_precision(2, n_digits);
+
+		assert(tmp.ref_lower()->precision() == n_digits);
+		assert(tmp.ref_upper()->precision() == n_digits);
 	}
 	return EXIT_SUCCESS;
 }
